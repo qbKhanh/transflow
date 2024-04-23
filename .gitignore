@@ -1,0 +1,15 @@
+# vscode checkpoint
+.vscode
+# environment
+transflow
+
+# checkpoint
+checkpoints
+# dataset
+dataset
+# output
+runs
+outputs
+output.pkl
+# test notebook
+test.ipynb

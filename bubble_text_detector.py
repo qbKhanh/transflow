@@ -2,6 +2,7 @@ import argparse
 import time
 import os
 import pickle
+from pathlib import Path
 
 from ultralytics import YOLO
 from ultralytics import YOLO
@@ -20,6 +21,7 @@ def get_parser():
     parser.add_argument('--device', type=str, default='cpu', help='device to use (cpu, cuda:0, cuda:1, ...)')
     parser.add_argument('--conf', type=float, default=0.25, help='confidence threshold')
     parser.add_argument('--iou', type=float, default=0.7, help='IoU threshold')
+    parser.add_argument('--save_crop', type=str, default='', help='path to save crop bubble text if not empty')
     return parser
 
 def get_model(args):
@@ -69,8 +71,12 @@ def main(args):
     for i, result in enumerate(results):
         sub_dict = dict()
         coords = result.boxes.xyxy
+        # Save the crop bubble text
+        if args.save_crop:
+            result.save_crop(f'{args.save_crop}', file_name=Path('im'))
         # Loop through each bubble text of an image
         for j, coord in enumerate(coords):
+            
             info_dict = dict()
             # Get coordinates of the bubble text
             info_dict['coord'] = (int(coord[0]), int(coord[1]), int(coord[2]), int(coord[3]))

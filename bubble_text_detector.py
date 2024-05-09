@@ -52,7 +52,6 @@ def main(args):
                 'img': original image,
                 'bubble_0': {
                     'coord': (x1, y1, x2, y2),
-                    'img': bubble_img
                     },
                 ...
                 },
@@ -81,7 +80,7 @@ def main(args):
             # Get coordinates of the bubble text
             info_dict['coord'] = (int(coord[0]), int(coord[1]), int(coord[2]), int(coord[3]))
             # Get the bubble text image
-            info_dict['img'] = result.orig_img[int(coord[1]):int(coord[3]), int(coord[0]):int(coord[2])]
+            # info_dict['img'] = result.orig_img[int(coord[1]):int(coord[3]), int(coord[0]):int(coord[2])]
 
             sub_dict[j] = info_dict
         # Get the original image

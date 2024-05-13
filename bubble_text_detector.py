@@ -14,25 +14,26 @@ def get_parser():
     parser = argparse.ArgumentParser(description='Detect bubble text')
     # input/output
     parser.add_argument('--image', type=str, help='path to image or image folder')
-    parser.add_argument('--output', type=str, default='output.pkl', help='path to save the output (pkl file)')
+    parser.add_argument('--output', type=str, default='', help='path to save the output')
 
     # YOLO options
-    parser.add_argument('--weights', type=str, default='checkpoints/comic-speech-bubble-detector-640.onnx', help='path to pretrained weights')
+    parser.add_argument('--weight', type=str, default='checkpoints/comic-speech-bubble-detector-640.onnx', help='path to pretrained weight')
     parser.add_argument('--device', type=str, default='cpu', help='device to use (cpu, cuda:0, cuda:1, ...)')
     parser.add_argument('--conf', type=float, default=0.25, help='confidence threshold')
     parser.add_argument('--iou', type=float, default=0.7, help='IoU threshold')
-    parser.add_argument('--save_crop', type=str, default='', help='path to save crop bubble text if not empty')
+    parser.add_argument('--save-crop', action='store_true', help='save crop bubble text')
+    parser.add_argument('--save-output', action='store_true', help='save output of detection')
     return parser
 
 def get_model(args):
     '''
     Load the YOLO model
     Args:
-        weights: path to the pretrained weights
+        weight: path to the pretrained weight
     Returns:
         model: YOLO model    
     '''
-    model = YOLO(args.weights, task='detect')
+    model = YOLO(args.weight, task='detect')
     return model
 
 def main(args):
@@ -41,7 +42,7 @@ def main(args):
     Args:
         image|str: path to the image or image folder
         output|str: path to save the output (pkl file)
-        weights|str: path to the pretrained weights
+        weight|str: path to the pretrained weight (YOLO)
         device|str: device to use (cpu, cuda:0, cuda:1, ...)
         conf|float: confidence threshold
         iou|float: IoU threshold
@@ -63,7 +64,7 @@ def main(args):
     # Load the YOLO model
     model = get_model(args)
     # Detect bubble text
-    results = model.predict(source=args.image, device=args.device) 
+    results = model.predict(source=args.image, device=args.device)
     result_info = dict() # Save the detection information
     
     # Loop through each image
@@ -72,7 +73,7 @@ def main(args):
         coords = result.boxes.xyxy
         # Save the crop bubble text
         if args.save_crop:
-            result.save_crop(f'{args.save_crop}', file_name=Path('im'))
+            result.save_crop(f'{args.output}', file_name=Path('im'))
         # Loop through each bubble text of an image
         for j, coord in enumerate(coords):
             
@@ -88,10 +89,11 @@ def main(args):
         # Get the bubble text information
         result_info[i] = sub_dict
 
-    pickle_path = args.output if '.pkl' in args.output else args.output + '.pkl'
-    # Save detection infor to a pickle file
-    with open(pickle_path, 'wb') as file:
-        pickle.dump(result_info, file)
+        if args.save_output:
+            pickle_path = args.output + '/output.pkl'
+            # Save detection infor to a pickle file
+            with open(pickle_path, 'wb') as file:
+                pickle.dump(result_info, file)
 
     end_time = time.time()
     print(f"Time taken: {round(end_time - start_time, 2)} seconds")

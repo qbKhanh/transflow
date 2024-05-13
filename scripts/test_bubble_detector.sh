@@ -1,0 +1,1 @@
+python3 bubble_text_detector.py --image dataset/GarakutayaManta --weight checkpoints/comic-speech-bubble-detector.pt --device cuda:0 --output TEST --save-output

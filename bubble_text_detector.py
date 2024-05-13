@@ -51,10 +51,12 @@ def main(args):
             {
             'img_0': {
                 'img': original image,
-                'bubble_0': {
-                    'coord': (x1, y1, x2, y2),
+                'bubbles': {
+                    'bubble_0': {
+                        'coord': (x1, y1, x2, y2),
+                        },
+                    ...
                     },
-                ...
                 },
             ...
             }
@@ -65,40 +67,38 @@ def main(args):
     model = get_model(args)
     # Detect bubble text
     results = model.predict(source=args.image, device=args.device)
-    result_info = dict() # Save the detection information
+    output_dict = dict() # Save the detection information
     
     # Loop through each image
     for i, result in enumerate(results):
-        sub_dict = dict()
+        bubble_dict = dict() # save bubble text information
         coords = result.boxes.xyxy
         # Save the crop bubble text
         if args.save_crop:
+            os.makedirs(args.output, exist_ok=True)
             result.save_crop(f'{args.output}', file_name=Path('im'))
         # Loop through each bubble text of an image
         for j, coord in enumerate(coords):
-            
-            info_dict = dict()
             # Get coordinates of the bubble text
-            info_dict['coord'] = (int(coord[0]), int(coord[1]), int(coord[2]), int(coord[3]))
-            # Get the bubble text image
-            # info_dict['img'] = result.orig_img[int(coord[1]):int(coord[3]), int(coord[0]):int(coord[2])]
+            bubble_dict[j] = {'coord':(int(coord[0]), int(coord[1]), int(coord[2]), int(coord[3]))}
+            
+        # Get all information
+        output_dict[i] = {
+            'img': result.orig_img,
+            'bubbles': bubble_dict
+        }
 
-            sub_dict[j] = info_dict
-        # Get the original image
-        result_info['img'] = result.orig_img
-        # Get the bubble text information
-        result_info[i] = sub_dict
-
-        if args.save_output:
-            pickle_path = args.output + '/output.pkl'
-            # Save detection infor to a pickle file
-            with open(pickle_path, 'wb') as file:
-                pickle.dump(result_info, file)
+    if args.save_output:
+        os.makedirs(args.output, exist_ok=True)
+        pickle_path = args.output + '/output.pkl'
+        # Save detection infor to a pickle file
+        with open(pickle_path, 'wb') as file:
+            pickle.dump(output_dict, file)
 
     end_time = time.time()
     print(f"Time taken: {round(end_time - start_time, 2)} seconds")
 
-    return result_info
+    return output_dict
 
 if __name__ == '__main__':
     parser = get_parser()

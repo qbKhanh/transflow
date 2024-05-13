@@ -73,6 +73,10 @@ def main(args):
     for i, result in enumerate(results):
         bubble_dict = dict() # save bubble text information
         coords = result.boxes.xyxy
+        # Get absolute path of the image
+        image_path = result.path
+        # Convert to relative path
+        re_image_path = image_path.replace(os.getcwd() + '/', '')
         # Save the crop bubble text
         if args.save_crop:
             os.makedirs(args.output, exist_ok=True)
@@ -84,7 +88,8 @@ def main(args):
             
         # Get all information
         output_dict[i] = {
-            'img': result.orig_img,
+            # 'img': result.orig_img,
+            'img': re_image_path,
             'bubbles': bubble_dict
         }
 

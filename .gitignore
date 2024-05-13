@@ -11,5 +11,6 @@ dataset
 runs
 outputs
 output.pkl
+TEST
 # test notebook
 test.ipynb

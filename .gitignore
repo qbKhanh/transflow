@@ -1,5 +1,6 @@
 # vscode checkpoint
 .vscode
+__pycache__
 # environment
 transflow
 

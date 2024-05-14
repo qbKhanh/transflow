@@ -1,7 +1,7 @@
 
 
 python3 pipeline.py \
-    --image dataset/GarakutayaManta \
+    --image dataset/004.jpg \
     --output TEST \
     --device cuda:0 \
     --dt-weight checkpoints/comic-speech-bubble-detector.pt \

@@ -1,18 +1,24 @@
 from detector import *
 from ocr import *
 from translate import *
+from text_segment import *
 from utils import *
 
 def main(args):
     # Get model
-    dt_model, ocr_model = get_model(args)
+    dt_model, ocr_model, sg_model = get_model(args)
     dt_output = detect_bubble_text(args, dt_model)
     ocr_output = get_text_from_bubble(args, ocr_model, dt_output)
-    translated_output = translate(ocr_output)
-    pickle_path = args.output + '/output_trs.pkl'
-    # Save detection infor to a pickle file
-    with open(pickle_path, 'wb') as file:
-        pickle.dump(translated_output, file)
+    trs_output = translate(ocr_output)
+    segmented_output = segment_text(args, sg_model, trs_output)
+
+    trs_path = args.output + '/output_trs.pkl'
+    with open(trs_path, 'wb') as file:
+        pickle.dump(trs_output, file)
+    
+    sg_path = args.output + '/output_sg.pkl'
+    with open(sg_path, 'wb') as file:
+        pickle.dump(segmented_output, file)
     # print(translated_output)
 
 if __name__ == '__main__':

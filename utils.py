@@ -24,12 +24,15 @@ def get_parser():
     parser.add_argument('--output', type=str, default='', help='path to save the output')
     parser.add_argument('--device', type=str, default='cpu', help='device to use (cpu, cuda:0, cuda:1, ...)')
 
-    # YOLO options
+    # YOLO detect options
     parser.add_argument('--dt-weight', type=str, default='checkpoints/comic-speech-bubble-detector-640.onnx', help='path to pretrained weight')
     parser.add_argument('--conf', type=float, default=0.25, help='confidence threshold')
     parser.add_argument('--iou', type=float, default=0.7, help='IoU threshold')
     parser.add_argument('--save-crop', action='store_true', help='save crop bubble text')
     parser.add_argument('--save-dt-output', action='store_true', help='save output of detection')
+
+    # YOLO segment options
+    parser.add_argument('--sg-weight', type=str, default='checkpoints/comic-text-segmenter.pt', help='path to pretrained weight')
     
     # OCR options
     parser.add_argument('--ocr-lang', type=str, default='jp', help="language to OCR from ['jp', 'cn', 'kr', 'en']")
@@ -49,6 +52,8 @@ def get_model(args):
     '''
     # Get YOLO detector model
     dt_model = YOLO(args.dt_weight, task='detect')
+    # Get YOLO segment model
+    sg_model = YOLO(args.sg_weight, task='segment')
 
     # Get OCR model
     lang_abbrv = ['jp', 'cn', 'kr', 'en']
@@ -70,7 +75,7 @@ def get_model(args):
     else:
         print("The language you want have NOT been implemented yet, stay tune for future update")
         raise NotImplementedError
-    return dt_model, ocr_model
+    return dt_model, ocr_model, sg_model
 
 # Utils
 def crop_image(image, coordinates):

@@ -14,6 +14,8 @@
 python3 bubble_text_detector.py --image path_to_image_or_image_folder
 `
 ## Test Pipeline
+![doc/pipeline.png](doc/pipeline.png)
+
 _NOTE: replace inference options in [scripts/test_pipeline.sh](scripts/test_pipeline.sh)_
 
 `

@@ -51,7 +51,7 @@ def get_model(args):
         model: YOLO model    
     '''
     # Get YOLO detector model
-    dt_model = YOLO(args.dt_weight, task='detect')
+    # dt_model = YOLO(args.dt_weight, task='detect')
     # Get YOLO segment model
     sg_model = YOLO(args.sg_weight, task='segment')
 
@@ -75,7 +75,7 @@ def get_model(args):
     else:
         print("The language you want have NOT been implemented yet, stay tune for future update")
         raise NotImplementedError
-    return dt_model, ocr_model, sg_model
+    return ocr_model, sg_model
 
 # Utils
 def crop_image(image, coordinates):

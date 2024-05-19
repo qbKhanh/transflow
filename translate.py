@@ -3,6 +3,24 @@ import translators as ts
 import pickle
 
 def translate(data):
+    '''
+    Return:
+        {
+        'img_0': {
+            'img': original image path,
+            'rm_img': removed text image path,
+            'bubbles': {
+                'bubble_0': {
+                    'coord': (x1, y1, x2, y2),
+                    'text': text from the bubble,
+                    'trs_text': translated text,
+                    },
+                ...
+                },
+            },
+        ...
+        }
+    '''
     for key, value in data.items():
         temp_list = []
         for key, small_value in value['bubbles'].items():

@@ -18,7 +18,20 @@ def get_text_from_bubble(args, ocr_model, dt_output):
     the_bubble_output(nested_dict): the output from bubble_text_detector.py
 
     Return:
-    idk nested dict that append the text in? COCO JSON file? txt file?? 
+    {
+    'img_0': {
+        'img': original image path,
+        'rm_img': removed text image path,
+        'bubbles': {
+            'bubble_0': {
+                'coord': (x1, y1, x2, y2),
+                'text': text from the bubble,
+                },
+            ...
+            },
+        },
+    ...
+    }
     '''
     # Load from output.pkl (which is a nested dict by itself)
     if dt_output:

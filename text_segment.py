@@ -8,45 +8,50 @@ import numpy as np
 from ultralytics import YOLO
 from remove_text import *
 
-def segment_text(args, sg_model=None, trs_output=None):
+def segment_text(args, sg_model=None):
     '''
-    Segment the text from the bubble and remove it
+    Detect text in image and remove it
     Args:
-        args: arguments
-        sg_model: YOLO model for segmenting text
-        trs_output: translated output
+        args: argument parser
+        sg_model: YOLO model for segmentation
     Returns:
-        nested_data: nested dictionary containing the segmented text
-            additional key: 'removed_image': path to the image with removed text
+        output_dict: detection information
+            {
+            'img_0': {
+                'img': original image path,
+                'rm_img': removed text image path,
+                'bubbles': {
+                    'bubble_0': {
+                        'coord': (x1, y1, x2, y2),
+                        },
+                    ...
+                    },
+                },
+            ...
+            }
     '''
-    if trs_output:
-        nested_data = trs_output
-    else:
-        bubble_pkl_output = os.path.join(args.output, 'output_dt.pkl') 
-        if bubble_pkl_output.endswith('.pkl'):
-            with open(bubble_pkl_output, 'rb') as file:
-                nested_data = pickle.load(file)
-
     # Load the model
     if sg_model:
-        model = sg_model
+        sg_model = sg_model
     else:
-        model = YOLO(args.sg_weight, task='segment')
-    
-    images_list = [nested_data[i]['img'] for i in range(len(nested_data))]
+        sg_model = YOLO(args.sg_weight, task='segment')
 
     # Perform prediction
-    results = model.predict(source=images_list, device=args.device) 
+    results = sg_model.predict(source=args.image, device=args.device) 
+    output_dict = dict() # Save the detection information
+    
+    # Visualize the segmentation masks and draw bounding boxes
+    for i, result in enumerate(results):
+        bubble_dict = dict() # save bubble text information
 
-    # Visualize the segmentation masks
-    for idx, result in enumerate(results):
         # Load the image using OpenCV
         image_path = result.path
+        re_image_path = image_path.replace(os.getcwd() + '/', '') # convert to relative path
         original_image = cv2.imread(image_path)
+        # Ensure the image is in the correct format (BGR to RGB)
         image_rgb = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
 
         # Loop through each segmentation result
-        # print(result.path.split('/')[-1])
         for mask in result.masks:
             # Convert the mask to a binary mask
             binary_mask = mask.data.cpu().numpy().astype(np.uint8)
@@ -59,16 +64,29 @@ def segment_text(args, sg_model=None, trs_output=None):
             binary_mask = cv2.resize(binary_mask, (original_image.shape[1], original_image.shape[0]), interpolation=cv2.INTER_NEAREST)
             
             # Replace the segment area with white color
-            removed_image = simple_remove(image_rgb, binary_mask)
-
+            image_rgb = simple_remove(image_rgb, binary_mask)
+        # Save removed text image
+        os.makedirs(f'{args.output}/removed', exist_ok=True)
         # Convert the image back to BGR format for OpenCV
-        removed_image = cv2.cvtColor(removed_image, cv2.COLOR_RGB2BGR)
+        image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(f'{args.output}/removed/{re_image_path.split("/")[-1]}', image_bgr)
 
-        # Save the result
-        if 1:
-            os.makedirs(f"{args.output}/remove", exist_ok=True)
-            cv2.imwrite(f"{args.output}/remove/{result.path.split('/')[-1]}", removed_image)
-        nested_data[idx]['removed_image'] = f"{args.output}/remove/{result.path.split('/')[-1]}"
+        # Loop through each bounding box result
+        for j, box in enumerate(result.boxes):
+            # Extract box coordinates
+            x1, y1, x2, y2 = map(int, box.xyxy[0].cpu().numpy())
+            bubble_dict[j] = {'coord':(x1, y1, x2, y2)}
+            
+            # Draw the bounding box on the image
+            # cv2.rectangle(image_rgb, (x1, y1), (x2, y2), (0, 255, 0), 2)  # Green box with thickness 2
+        # Get all information
+        output_dict[i] = {
+            # 'img': result.orig_img,
+            'img': re_image_path,
+            'rm_img': f'removed/{re_image_path.split("/")[-1]}',
+            'bubbles': bubble_dict
+        }
 
-    return nested_data
+    return output_dict
+
 

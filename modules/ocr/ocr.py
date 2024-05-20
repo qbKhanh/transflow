@@ -4,7 +4,7 @@ import pickle
 
 from manga_ocr import MangaOcr
 # import paddleocr
-from utils import *
+from modules.utils import *
 
 import warnings
 warnings.filterwarnings("ignore")

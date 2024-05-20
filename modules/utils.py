@@ -24,6 +24,12 @@ def get_parser():
     parser.add_argument('--output', type=str, default='', help='path to save the output')
     parser.add_argument('--device', type=str, default='cpu', help='device to use (cpu, cuda:0, cuda:1, ...)')
 
+    # Render options
+    parser.add_argument('--font-path', type=str, help='path to font file')
+    parser.add_argument('--font-size', type=int, help='init font size')
+    parser.add_argument('--align', type=str, default='center', help='text alignment: left, center, right')
+    parser.add_argument('--colour', type=str, default='#000', help='text colour')
+
     # YOLO detect options
     parser.add_argument('--dt-weight', type=str, default='checkpoints/comic-speech-bubble-detector.pt', help='path to pretrained weight')
     parser.add_argument('--conf', type=float, default=0.25, help='confidence threshold')
@@ -88,3 +94,11 @@ def crop_image(image, coordinates):
     '''
     cropped_img = image.crop(coordinates)
     return cropped_img
+
+def convert_xyxy_to_xywh(xyxy_box):
+    x1, y1, x2, y2 = xyxy_box
+    x = x1
+    y = y1
+    width = x2 - x1
+    height = y2 - y1
+    return x, y, width, height

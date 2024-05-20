@@ -9,7 +9,7 @@ import cv2
 
 from ultralytics import YOLO
 
-from utils import *
+from modules.utils import *
 
 
 # def get_parser():

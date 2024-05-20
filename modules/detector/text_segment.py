@@ -6,7 +6,7 @@ import pickle
 import numpy as np
 
 from ultralytics import YOLO
-from remove_text import *
+from modules.render.remove_text import *
 
 def segment_text(args, sg_model=None):
     '''
@@ -83,7 +83,7 @@ def segment_text(args, sg_model=None):
         output_dict[i] = {
             # 'img': result.orig_img,
             'img': re_image_path,
-            'rm_img': f'removed/{re_image_path.split("/")[-1]}',
+            'rm_img': f'{args.output}/removed/{re_image_path.split("/")[-1]}',
             'bubbles': bubble_dict
         }
 

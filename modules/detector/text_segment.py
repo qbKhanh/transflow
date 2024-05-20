@@ -2,6 +2,7 @@ import os
 import cv2
 from PIL import Image
 import pickle
+import time
 
 import numpy as np
 
@@ -30,6 +31,7 @@ def segment_text(args, sg_model=None):
             ...
             }
     '''
+    start_time = time.time()
     # Load the model
     if sg_model:
         sg_model = sg_model
@@ -86,6 +88,7 @@ def segment_text(args, sg_model=None):
             'rm_img': f'{args.output}/removed/{re_image_path.split("/")[-1]}',
             'bubbles': bubble_dict
         }
+    print(f"Segmentation time: {round(time.time() - start_time, 3)}s")
 
     return output_dict
 

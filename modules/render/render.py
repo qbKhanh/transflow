@@ -80,9 +80,10 @@ def draw_text(image: np.ndarray, coord_list: list, text_list: list, font_pth: st
     return image
 
 def render(args, trs_output: dict):
+    start_time = time.time()
     for i in range(len(trs_output)):
         image_dict = trs_output[i]
-        image_path = args.output + '/' + image_dict['rm_img']
+        image_path = image_dict['rm_img']
         image = cv2.imread(image_path)
         coord_list = []
         text_list = []
@@ -94,7 +95,7 @@ def render(args, trs_output: dict):
         output_folder = os.path.join(args.output, 'final')
         os.makedirs(output_folder, exist_ok=True)
         cv2.imwrite(f"{output_folder}/{image_path.split('/')[-1]}", image)
-            
+    print(f"Rendering time: {time.time() - start_time:.3f}s")
 
 
 

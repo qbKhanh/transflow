@@ -1,6 +1,7 @@
 import pandas as pd
 import translators as ts
 import pickle
+import time
 
 def translate(data):
     '''
@@ -21,6 +22,7 @@ def translate(data):
         ...
         }
     '''
+    start_time = time.time()
     for key, value in data.items():
         temp_list = []
         for key, small_value in value['bubbles'].items():
@@ -38,4 +40,6 @@ def translate(data):
         for key, small_value in value['bubbles'].items():
             small_value['trs_text'] = trans_list[counter]
             counter += 1
+    print(f'Translating time: {time.time() - start_time:.3f} seconds')
+
     return data

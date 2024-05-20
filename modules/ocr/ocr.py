@@ -33,6 +33,7 @@ def get_text_from_bubble(args, ocr_model, dt_output):
     ...
     }
     '''
+    start_time = time.time()
     # Load from output.pkl (which is a nested dict by itself)
     if dt_output:
         nested_data = dt_output
@@ -65,6 +66,8 @@ def get_text_from_bubble(args, ocr_model, dt_output):
         pkl_path = os.path.join(args.output, 'output_ocr.pkl')
         with open(pkl_path, 'wb') as file:
             pickle.dump(nested_data, file)
+        
+    print(f'OCR time: {round(time.time() - start_time, 3)}s')    
     return nested_data
 
 # x = get_text_from_bubble('jp', '/home/doki/Code_workspace/EXE_project/transflow/TEST/output.pkl')

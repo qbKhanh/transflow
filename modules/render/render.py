@@ -35,10 +35,11 @@ def pil_word_wrap(image: Image, tbbox_top_left: Tuple, font_pth: str, init_font_
         return (right-left, bottom-top)
 
     while font_size > 1:
+        time_start = time.time()
         font = font.font_variant(size=font_size)
         width, height = eval_metrics(mutable_message, font)
         if height > roi_height:
-            font_size -= 0.75  # Reduce pointsize
+            font_size -= 1  # Reduce pointsize
             mutable_message = text  # Restore original text
         elif width > roi_width:
             columns = len(mutable_message)
@@ -51,10 +52,11 @@ def pil_word_wrap(image: Image, tbbox_top_left: Tuple, font_pth: str, init_font_
                 if wrapped_width <= roi_width:
                     break
             if columns < 1:
-                font_size -= 0.75  # Reduce pointsize
+                font_size -= 1  # Reduce pointsize
                 mutable_message = text  # Restore original text
         else:
             break
+        print(f"Font size: {font_size}, Time: {time.time() - time_start:.3f}s")
 
     return mutable_message, font_size
 
@@ -65,17 +67,20 @@ def draw_text(image: np.ndarray, coord_list: list, text_list: list, font_pth: st
     font = ImageFont.truetype(font_pth, size=init_font_size)
 
     for i in range(len(coord_list)):
+        
         x1, y1, width, height = convert_xyxy_to_xywh(coord_list[i])
         tbbox_top_left = (x1, y1)
 
         translation = text_list[i]
         if not translation or len(translation) == 1:
             continue
-        
+        loop_time = time.time()
         translation, font_size = pil_word_wrap(image, tbbox_top_left, font_pth, init_font_size, translation, width, height, align, 4)
+        print(f"Drawing text {i} took {time.time() - loop_time:.3f}s")
         font = font.font_variant(size=font_size)
         
         draw.multiline_text(tbbox_top_left, translation, colour, font, align=align, spacing=1)
+        
     image = pil_to_cv2(image)
     return image
 

@@ -9,7 +9,7 @@ import cv2
 
 from ultralytics import YOLO
 
-from utils import *
+from modules.utils import *
 
 
 # def get_parser():
@@ -38,7 +38,7 @@ from utils import *
 #     model = YOLO(args.dt_weight, task='detect')
 #     return model
 
-def detect_bubble_text(args, dt_model):
+def detect_bubble_text(args, dt_model=None):
     '''
     Detect bubble text in image
     Args:
@@ -66,7 +66,10 @@ def detect_bubble_text(args, dt_model):
     '''
     start_time = time.time()
     # Load the YOLO model
-    model = dt_model
+    if dt_model:
+        model = dt_model
+    else:
+        model = YOLO(args.dt_weight, task='detect')
     # Detect bubble text
     results = model.predict(source=args.image, device=args.device)
     output_dict = dict() # Save the detection information

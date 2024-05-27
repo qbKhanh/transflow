@@ -4,7 +4,7 @@ import pickle
 
 from manga_ocr import MangaOcr
 # import paddleocr
-from utils import *
+from modules.utils import *
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -18,8 +18,22 @@ def get_text_from_bubble(args, ocr_model, dt_output):
     the_bubble_output(nested_dict): the output from bubble_text_detector.py
 
     Return:
-    idk nested dict that append the text in? COCO JSON file? txt file?? 
+    {
+    'img_0': {
+        'img': original image path,
+        'rm_img': removed text image path,
+        'bubbles': {
+            'bubble_0': {
+                'coord': (x1, y1, x2, y2),
+                'text': text from the bubble,
+                },
+            ...
+            },
+        },
+    ...
+    }
     '''
+    start_time = time.time()
     # Load from output.pkl (which is a nested dict by itself)
     if dt_output:
         nested_data = dt_output
@@ -52,6 +66,8 @@ def get_text_from_bubble(args, ocr_model, dt_output):
         pkl_path = os.path.join(args.output, 'output_ocr.pkl')
         with open(pkl_path, 'wb') as file:
             pickle.dump(nested_data, file)
+        
+    print(f'OCR time: {round(time.time() - start_time, 3)}s')    
     return nested_data
 
 # x = get_text_from_bubble('jp', '/home/doki/Code_workspace/EXE_project/transflow/TEST/output.pkl')

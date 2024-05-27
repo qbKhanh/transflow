@@ -1,6 +1,7 @@
-python3 bubble_text_detector.py /
-    --image dataset/GarakutayaManta /
-    --weight /home/doki/Downloads/comic-speech-bubble-detector-640.onnx /
-    --device cuda:0 /
-    --output TEST /
-    --save-output
+python3 detector.py \
+    --image dataset/GarakutayaManta \
+    --output TEST \
+    --device cuda:0 \
+    --dt-weight checkpoints/comic-speech-bubble-detector.pt \
+    --save-crop \
+    --save-dt-output \

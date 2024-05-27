@@ -1,3 +1,4 @@
 ultralytics
 manga-ocr
 paddleocr
+argostranslate
